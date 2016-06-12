@@ -7,7 +7,7 @@ use utf8;
 use JSON;
 use Params::Validate qw(:all);
 
-our $VERSION = 0.001;
+our $VERSION = 0.002;
 
 =encoding utf-8
 
@@ -85,9 +85,27 @@ FIRST_PART_DYGRAPH
 </html>
 SECOND_PART_DYGRAPH
 
+    my $transform_data;
+    $transform_data = sub {
+        my $data        = shift;
+        my $string_data = "";
+        if ( ref $data eq 'ARRAY' ) {
+            $string_data .= "[" . ( join( ',', map { $transform_data->($_) } @$data ) ) . "]";
+        } elsif ( ref $data eq 'HASH' ) {
+            return "not supported";
+        } elsif ( ref $data eq 'DateTime' ) {
+            return 'new Date("' . $data . '")';
+        } else {
+            return $data;
+        }
+        return $string_data;
+    };
+    my $data_string = $transform_data->( $params{'data'} );
+
+    my $json_formatter = JSON->new->utf8;
     return
         $template_first_part
-      . join( ',', map { to_json( $_, { allow_nonref => 1 } ) } @params{qw(data options)} )
+      . join( ',', $data_string, $json_formatter->encode( $params{'options'} ) )
       . $template_second_part;
 }
 

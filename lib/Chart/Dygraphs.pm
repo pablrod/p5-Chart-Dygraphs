@@ -70,7 +70,7 @@ Optional
 sub render_full_html {
     my %params = validate( @_,
                            {  data    => { type => SCALAR | ARRAYREF },
-                              options => { type => HASHREF, default => {} }
+                              options => { type => HASHREF, default => { showRangeSelector => 1 } }
                            }
     );
 
@@ -78,17 +78,22 @@ sub render_full_html {
 <html>
 <head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
+<style>
+#graphdiv { position: absolute; left: 20px; right: 20px; top: 20px; bottom: 20px; }
+</style>
 </head>
 <body>
 <div id="graphdiv"></div>
 <script type="text/javascript">
   g = new Dygraph(
     document.getElementById("graphdiv"),
-    
 FIRST_PART_DYGRAPH
 
     my $template_second_part = <<'SECOND_PART_DYGRAPH';
   );
+
+  var range = g.yAxisRange(0);
+  g.updateOptions({valueRange: range});
 </script>
 </body>
 </html>

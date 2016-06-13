@@ -7,7 +7,7 @@ use utf8;
 use JSON;
 use Params::Validate qw(:all);
 
-our $VERSION = 0.002;
+our $VERSION = 0.003;
 
 =encoding utf-8
 

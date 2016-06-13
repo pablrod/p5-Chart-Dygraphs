@@ -7,13 +7,22 @@ Chart::Dygraphs - Generate html/javascript charts from perl data using javascrip
      use Chart::Dygraphs;
      use Browser::Open qw( open_browser );
      use Path::Tiny;
+     use DateTime;
      
      my $data = [map {[$_, rand($_)]} 1..10 ];
-     my $file_temp = Path::Tiny::tempfile(UNLINK => 0);
+     my $html_file = Path::Tiny::tempfile(UNLINK => 0);
      
-     $file_temp->spew_utf8(Chart::Dygraphs::render_full_html(data => $data));
+     $html_file->spew_utf8(Chart::Dygraphs::render_full_html(data => $data));
     
-     open_browser($file_temp->canonpath()); 
+     open_browser($html_file->canonpath()); 
+
+     my $start_date = DateTime->now(time_zone => 'UTC')->truncate(to => 'hour');
+     my $time_series_data = [map {[$start_date->add(hours => 1)->clone(), rand($_)]} 1..1000];
+     
+     my $time_series_html_file = Path::Tiny::tempfile(UNLINK => 0);
+     $time_series_html_file->spew_utf8(Chart::Dygraphs::render_full_html(data => $time_series_data));
+
+     open_browser($time_series_html_file->canonpath());
       
 
 # DESCRIPTION

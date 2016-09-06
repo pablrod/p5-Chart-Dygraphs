@@ -6,8 +6,9 @@ use utf8;
 
 use JSON;
 use Params::Validate qw(:all);
+use Text::Template;
 
-our $VERSION = 0.003;
+our $VERSION = 0.004;
 
 =encoding utf-8
 
@@ -63,6 +64,26 @@ Data to be represented. The format is the perl version of the data expected by D
 Hashref with options for graph. The format is the perl version of the options expected by Dygraphs: L<http://dygraphs.com/options.html>
 Optional
 
+=item * render_html_options
+
+Hashref with options controlling html output. With this you can inject html, javascript or styles.
+
+Supported options:
+
+=over
+
+=item * pre_graph_html
+
+=item * post_graph_html
+
+=item * dygraphs_div_id
+
+=item * dygraphs_javascript_object_name
+
+=item * dygraphs_div_inline_style
+
+=back
+
 =back
 
 =cut
@@ -70,34 +91,39 @@ Optional
 sub render_full_html {
     my %params = validate( @_,
                            {  data    => { type => SCALAR | ARRAYREF },
-                              options => { type => HASHREF, default => { showRangeSelector => 1 } }
+                              options => { type => HASHREF, default => { showRangeSelector => 1 } },
+                              render_html_options => {
+                                    type     => HASHREF,
+                                    optional => 1,
+                                    default => { dygraphs_div_id => 'graphdiv', dygraphs_javascript_object_name => 'g' }
+                              }
                            }
     );
 
-    my $template_first_part = <<'FIRST_PART_DYGRAPH';
+    my $template = <<'DYGRAPH_TEMPLATE';
 <html>
 <head>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
 <style>
-#graphdiv { position: absolute; left: 20px; right: 20px; top: 20px; bottom: 20px; }
+#{$dygraphs_div_id} \{ position: absolute; left: 20px; right: 20px; top: 20px; bottom: 20px; \}
 </style>
 </head>
 <body>
-<div id="graphdiv"></div>
+{$pre_graph_html}
+<div id="{$dygraphs_div_id}" style="{$dygraphs_div_inline_style}"></div>
 <script type="text/javascript">
-  g = new Dygraph(
-    document.getElementById("graphdiv"),
-FIRST_PART_DYGRAPH
-
-    my $template_second_part = <<'SECOND_PART_DYGRAPH';
+  {$dygraphs_javascript_object_name} = new Dygraph(
+    document.getElementById("{$dygraphs_div_id}"),
+    {$data_and_options}
   );
 
-  var range = g.yAxisRange(0);
-  g.updateOptions({valueRange: range});
+  var range = {$dygraphs_javascript_object_name}.yAxisRange(0);
+  {$dygraphs_javascript_object_name}.updateOptions({valueRange: range});
 </script>
+{$post_graph_html}
 </body>
 </html>
-SECOND_PART_DYGRAPH
+DYGRAPH_TEMPLATE
 
     my $transform_data;
     $transform_data = sub {
@@ -117,10 +143,19 @@ SECOND_PART_DYGRAPH
     my $data_string = $transform_data->( $params{'data'} );
 
     my $json_formatter = JSON->new->utf8;
-    return
-        $template_first_part
-      . join( ',', $data_string, $json_formatter->encode( $params{'options'} ) )
-      . $template_second_part;
+    my $template_variables = {
+                           %{ $params{'render_html_options'} },
+                           data_and_options => join( ',', $data_string, $json_formatter->encode( $params{'options'} ) ),
+    };
+
+    if ( ! defined $template_variables->{'dygraphs_div_id'} ) {
+        $template_variables->{'dygraphs_div_id'} = 'graphdiv';
+    }
+    if ( ! defined $template_variables->{'dygraphs_javascript_object_name'} ) {
+        $template_variables->{'dygraphs_javascript_object_name'} = 'g';
+    }
+
+    return Text::Template::fill_in_string( $template, HASH => $template_variables );
 }
 
 1;
@@ -167,13 +202,14 @@ direct or contributory patent infringement, then this Artistic License
 to you shall terminate on the date that such litigation is filed.
 
 Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES . THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+            FITNESS FOR A PARTICULAR
+              PURPOSE,                                 OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+              YOUR LOCAL LAW . UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+              CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+              CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+            EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+              .
 
 =cut
 

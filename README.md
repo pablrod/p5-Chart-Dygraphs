@@ -47,6 +47,18 @@ This module does not export anything and the interface is "sub" oriented, but th
     Hashref with options for graph. The format is the perl version of the options expected by Dygraphs: [http://dygraphs.com/options.html](http://dygraphs.com/options.html)
     Optional
 
+- render\_html\_options
+
+    Hashref with options controlling html output. With this you can inject html, javascript or styles.
+
+    Supported options:
+
+    - pre\_graph\_html
+    - post\_graph\_html
+    - dygraphs\_div\_id
+    - dygraphs\_javascript\_object\_name
+    - dygraphs\_div\_inline\_style
+
 # AUTHOR
 
 Pablo Rodríguez González
@@ -87,10 +99,11 @@ direct or contributory patent infringement, then this Artistic License
 to you shall terminate on the date that such litigation is filed.
 
 Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
-AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
-THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
-YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
-CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
-CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
-EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES . THE IMPLIED WARRANTIES OF MERCHANTABILITY,
+            FITNESS FOR A PARTICULAR
+              PURPOSE,                                 OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+              YOUR LOCAL LAW . UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+              CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+              CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+            EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
+              .

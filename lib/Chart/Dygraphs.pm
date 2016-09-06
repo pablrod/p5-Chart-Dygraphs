@@ -8,6 +8,8 @@ use JSON;
 use Params::Validate qw(:all);
 use Text::Template;
 
+# VERSION
+
 =encoding utf-8
 
 =head1 NAME

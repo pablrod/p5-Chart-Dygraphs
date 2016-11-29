@@ -4,9 +4,13 @@ use strict;
 use warnings;
 use utf8;
 
+use Exporter 'import';
+our @EXPORT_OK = qw(show_plot);
+
 use JSON;
 use Params::Validate qw(:all);
 use Text::Template;
+use HTML::Show;
 
 # VERSION
 
@@ -18,32 +22,16 @@ Chart::Dygraphs - Generate html/javascript charts from perl data using javascrip
 
 =head1 SYNOPSYS
 
-    use Chart::Dygraphs;
-    use Browser::Open qw( open_browser );
-    use Path::Tiny;
-    use DateTime;
-    
-    my $data = [map {[$_, rand($_)]} 1..10 ];
-    my $html_file = Path::Tiny::tempfile(UNLINK => 0);
-    
-    $html_file->spew_utf8(Chart::Dygraphs::render_full_html(data => $data));
-   
-    open_browser($html_file->canonpath()); 
+# EXAMPLE: examples/basic.pl
 
-    my $start_date = DateTime->now(time_zone => 'UTC')->truncate(to => 'hour');
-    my $time_series_data = [map {[$start_date->add(hours => 1)->clone(), rand($_)]} 1..1000];
-    
-    my $time_series_html_file = Path::Tiny::tempfile(UNLINK => 0);
-    $time_series_html_file->spew_utf8(Chart::Dygraphs::render_full_html(data => $time_series_data));
+# EXAMPLE: examples/time_series.pl
 
-    open_browser($time_series_html_file->canonpath());
-     
 =head1 DESCRIPTION
 
 Generate html/javascript charts from perl data using javascript library Dygraphs. The result
-is a file that you could see in your favourite browser.
+is html that you could see in your favourite browser.
 
-This module does not export anything and the interface is "sub" oriented, but the API is subject to changes.
+The interface is "sub" oriented, but the API is subject to changes.
 
 =head1 FUNCTIONS
 
@@ -148,14 +136,29 @@ DYGRAPH_TEMPLATE
                            data_and_options => join( ',', $data_string, $json_formatter->encode( $params{'options'} ) ),
     };
 
-    if ( ! defined $template_variables->{'dygraphs_div_id'} ) {
+    if ( !defined $template_variables->{'dygraphs_div_id'} ) {
         $template_variables->{'dygraphs_div_id'} = 'graphdiv';
     }
-    if ( ! defined $template_variables->{'dygraphs_javascript_object_name'} ) {
+    if ( !defined $template_variables->{'dygraphs_javascript_object_name'} ) {
         $template_variables->{'dygraphs_javascript_object_name'} = 'g';
     }
 
     return Text::Template::fill_in_string( $template, HASH => $template_variables );
+}
+
+=head2 show_plot
+
+Opens the plot in a browser locally
+
+=head3 Parameters
+
+Data to be represented. The format is the same as the parameter data in render_full_html
+
+=cut
+
+sub show_plot {
+    my $data = shift();
+    HTML::Show::show( render_full_html( data => $data ) );
 }
 
 1;

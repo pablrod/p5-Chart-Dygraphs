@@ -4,33 +4,25 @@ Chart::Dygraphs - Generate html/javascript charts from perl data using javascrip
 
 # SYNOPSYS
 
-     use Chart::Dygraphs;
-     use Browser::Open qw( open_browser );
-     use Path::Tiny;
-     use DateTime;
-     
-     my $data = [map {[$_, rand($_)]} 1..10 ];
-     my $html_file = Path::Tiny::tempfile(UNLINK => 0);
-     
-     $html_file->spew_utf8(Chart::Dygraphs::render_full_html(data => $data));
+    use Chart::Dygraphs qw(show_plot);
     
-     open_browser($html_file->canonpath()); 
+    my $data = [map {[$_, rand($_)]} 1..10 ];
+    show_plot($data);
 
-     my $start_date = DateTime->now(time_zone => 'UTC')->truncate(to => 'hour');
-     my $time_series_data = [map {[$start_date->add(hours => 1)->clone(), rand($_)]} 1..1000];
-     
-     my $time_series_html_file = Path::Tiny::tempfile(UNLINK => 0);
-     $time_series_html_file->spew_utf8(Chart::Dygraphs::render_full_html(data => $time_series_data));
-
-     open_browser($time_series_html_file->canonpath());
-      
+    use Chart::Dygraphs qw(show_plot);
+    use DateTime;
+    
+    my $start_date = DateTime->now(time_zone => 'UTC')->truncate(to => 'hour');
+    my $time_series_data = [map {[$start_date->add(hours => 1)->clone(), rand($_)]} 1..1000];
+    
+    show_plot($time_series_data);
 
 # DESCRIPTION
 
 Generate html/javascript charts from perl data using javascript library Dygraphs. The result
-is a file that you could see in your favourite browser.
+is html that you could see in your favourite browser.
 
-This module does not export anything and the interface is "sub" oriented, but the API is subject to changes.
+The interface is "sub" oriented, but the API is subject to changes.
 
 # FUNCTIONS
 
@@ -58,6 +50,14 @@ This module does not export anything and the interface is "sub" oriented, but th
     - dygraphs\_div\_id
     - dygraphs\_javascript\_object\_name
     - dygraphs\_div\_inline\_style
+
+## show\_plot
+
+Opens the plot in a browser locally
+
+### Parameters
+
+Data to be represented. The format is the same as the parameter data in render\_full\_html
 
 # AUTHOR
 

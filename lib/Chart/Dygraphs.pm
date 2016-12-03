@@ -11,6 +11,7 @@ use JSON;
 use Params::Validate qw(:all);
 use Text::Template;
 use HTML::Show;
+use Ref::Util;
 
 # VERSION
 
@@ -93,11 +94,11 @@ sub render_full_html {
 sub _transform_data {
     my $data        = shift;
     my $string_data = "";
-    if ( ref $data eq 'ARRAY' ) {
+    if ( Ref::Util::is_plain_arrayref($data) ) {
         $string_data .= "[" . ( join( ',', map { _transform_data($_) } @$data ) ) . "]";
-    } elsif ( ref $data eq 'HASH' ) {
+    } elsif ( Ref::Util::is_plain_hashref($data) ) {
         return "not supported";
-    } elsif ( ref $data eq 'DateTime' ) {
+    } elsif ( Ref::Util::is_blessed_ref($data) && $data->isa('DateTime') ) {
         return 'new Date("' . $data . '")';
     } else {
         return $data;

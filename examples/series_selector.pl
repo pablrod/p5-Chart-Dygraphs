@@ -21,15 +21,7 @@ use Chart::Dygraphs;
             pre_graph_html => '
             <p>
 	<input type=checkbox id="0" checked onClick="change(this)">
-	<label for="0"> Hindcast</label>
-	<input type=checkbox id="1" checked onClick="change(this)">
-	<label for="1"> Ensext sin corregir</label>
-	<input type=checkbox id="2" checked onClick="change(this)">
-	<label for="2"> Estacionalidad</label>
-	<input type=checkbox id="3" checked onClick="change(this)">
-	<label for="3"> Ensext</label>
-	<input type=checkbox id="4" checked onClick="change(this)">
-	<label for="4"> Ensemble</label>
+	<label for="0">Series 1</label>
 </p><hr />',
             post_graph_html => '
             <script type="text/javascript">

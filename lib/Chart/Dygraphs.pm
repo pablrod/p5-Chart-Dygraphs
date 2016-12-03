@@ -83,20 +83,41 @@ sub render_full_html {
                               render_html_options => {
                                     type     => HASHREF,
                                     optional => 1,
-                                    default => { dygraphs_div_id => 'graphdiv', dygraphs_javascript_object_name => 'g' }
+                                    default => {}
                               }
                            }
     );
+	return _render_html_wrap(_render_cell(_process_data_and_options(@params{qw(data options)}), $params{'render_html_options'}, ''));
+}
 
-    my $template = <<'DYGRAPH_TEMPLATE';
-<html>
-<head>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
-<style>
-#{$dygraphs_div_id} \{ position: absolute; left: 20px; right: 20px; top: 20px; bottom: 20px; \}
-</style>
-</head>
-<body>
+sub _transform_data {
+    my $data        = shift;
+    my $string_data = "";
+    if ( ref $data eq 'ARRAY' ) {
+        $string_data .= "[" . ( join( ',', map { _transform_data($_) } @$data ) ) . "]";
+    } elsif ( ref $data eq 'HASH' ) {
+        return "not supported";
+    } elsif ( ref $data eq 'DateTime' ) {
+        return 'new Date("' . $data . '")';
+    } else {
+        return $data;
+    }
+    return $string_data;
+}
+
+sub _process_data_and_options {
+    my $data           = shift();
+    my $options        = shift();
+    my $json_formatter = JSON->new->utf8;
+    return join( ',', _transform_data($data), $json_formatter->encode($options) );
+}
+
+sub _render_cell {
+
+    my $data         = shift();
+    my $html_options = shift();
+    my $id           = shift();
+    my $template     = <<'TEMPLATE';
 {$pre_graph_html}
 <div id="{$dygraphs_div_id}" style="{$dygraphs_div_inline_style}"></div>
 <script type="text/javascript">
@@ -106,44 +127,43 @@ sub render_full_html {
   );
 
   var range = {$dygraphs_javascript_object_name}.yAxisRange(0);
-  {$dygraphs_javascript_object_name}.updateOptions({valueRange: range});
+  {$dygraphs_javascript_object_name}.updateOptions(\{valueRange: range\});
 </script>
 {$post_graph_html}
-</body>
-</html>
-DYGRAPH_TEMPLATE
-
-    my $transform_data;
-    $transform_data = sub {
-        my $data        = shift;
-        my $string_data = "";
-        if ( ref $data eq 'ARRAY' ) {
-            $string_data .= "[" . ( join( ',', map { $transform_data->($_) } @$data ) ) . "]";
-        } elsif ( ref $data eq 'HASH' ) {
-            return "not supported";
-        } elsif ( ref $data eq 'DateTime' ) {
-            return 'new Date("' . $data . '")';
-        } else {
-            return $data;
-        }
-        return $string_data;
-    };
-    my $data_string = $transform_data->( $params{'data'} );
-
-    my $json_formatter = JSON->new->utf8;
-    my $template_variables = {
-                           %{ $params{'render_html_options'} },
-                           data_and_options => join( ',', $data_string, $json_formatter->encode( $params{'options'} ) ),
-    };
+TEMPLATE
+    my $template_variables = { %{$html_options}, data_and_options => $data, };
 
     if ( !defined $template_variables->{'dygraphs_div_id'} ) {
-        $template_variables->{'dygraphs_div_id'} = 'graphdiv';
+        $template_variables->{'dygraphs_div_id'} = 'graphdiv' . $id;
     }
     if ( !defined $template_variables->{'dygraphs_javascript_object_name'} ) {
-        $template_variables->{'dygraphs_javascript_object_name'} = 'g';
+        $template_variables->{'dygraphs_javascript_object_name'} = 'g' . $id;
     }
+	if ( !defined $template_variables->{'dygraphs_div_inline_style'} ) {
+        $template_variables->{'dygraphs_div_inline_style'} = 'width: 100%';
+	}
+	my $renderer = Text::Template->new(TYPE => 'STRING', SOURCE => $template );	
+    return $renderer->fill_in( HASH => $template_variables );
+}
 
-    return Text::Template::fill_in_string( $template, HASH => $template_variables );
+sub _render_html_wrap {
+    my $body = shift();
+
+    my $html_begin = <<'BEGIN_HTML';
+<html>
+<head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
+</head>
+<body>
+BEGIN_HTML
+
+    my $html_end = <<'END_HTML';
+</body>
+</html>
+END_HTML
+
+    return $html_begin . $body . $html_end;
+
 }
 
 =head2 show_plot
@@ -157,8 +177,18 @@ Data to be represented. The format is the same as the parameter data in render_f
 =cut
 
 sub show_plot {
-    my $data = shift();
-    HTML::Show::show( render_full_html( data => $data ) );
+    my @data_to_plot = @_;
+
+    my $rendered_cells = "";
+    my $numeric_id     = 0;
+    for my $data (@data_to_plot) {
+        $rendered_cells .= _render_cell( _process_data_and_options( $data, { showRangeSelector => 1 } ),
+                                         { dygraphs_div_id => 'graphdiv' . $numeric_id, dygraphs_javascript_object_name => 'g' . $numeric_id },
+                                         'chart_' . $numeric_id++
+        );
+    }
+    my $plots = _render_html_wrap($rendered_cells);
+    HTML::Show::show($plots);
 }
 
 1;

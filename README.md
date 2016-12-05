@@ -61,7 +61,7 @@ Data to be represented. The format is the same as the parameter data in render\_
 
 # AUTHOR
 
-Pablo Rodr�guez Gonz�lez
+Pablo Rodríguez González
 
 # BUGS
 
@@ -69,7 +69,7 @@ Please report any bugs or feature requests via github: [https://github.com/pablr
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2016 Pablo Rodr�guez Gonz�lez.
+Copyright 2016 Pablo Rodríguez González.
 
 This program is free software; you can redistribute it and/or modify it
 under the terms of the the Artistic License (2.0). You may obtain a

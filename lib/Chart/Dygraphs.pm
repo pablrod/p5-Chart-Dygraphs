@@ -32,6 +32,22 @@ Chart::Dygraphs - Generate html/javascript charts from perl data using javascrip
 Generate html/javascript charts from perl data using javascript library Dygraphs. The result
 is html that you could see in your favourite browser.
 
+Example screenshot of plot generated with examples/time_series.pl:
+
+=begin HTML
+
+<p>
+<img src="https://raw.githubusercontent.com/pablrod/p5-Chart-Dygraphs/master/examples/time_series.png" alt="Random time series plotted with Dygraphs">
+</p>
+
+=end HTML
+
+=begin markdown
+
+![Random time series plotted with Dygraphs](https://raw.githubusercontent.com/pablrod/p5-Chart-Dygraphs/master/examples/time_series.png)
+
+=end markdown
+
 The interface is "sub" oriented, but the API is subject to changes.
 
 =head1 FUNCTIONS

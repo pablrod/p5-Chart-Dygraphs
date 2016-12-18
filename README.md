@@ -4,23 +4,29 @@ Chart::Dygraphs - Generate html/javascript charts from perl data using javascrip
 
 # SYNOPSYS
 
-    use Chart::Dygraphs qw(show_plot);
-    
-    my $data = [map {[$_, rand($_)]} 1..10 ];
-    show_plot($data);
+```perl
+use Chart::Dygraphs qw(show_plot);
 
-    use Chart::Dygraphs qw(show_plot);
-    use DateTime;
-    
-    my $start_date = DateTime->now(time_zone => 'UTC')->truncate(to => 'hour');
-    my $time_series_data = [map {[$start_date->add(hours => 1)->clone(), rand($_)]} 1..1000];
-    
-    show_plot($time_series_data);
+my $data = [map {[$_, rand($_)]} 1..10 ];
+show_plot($data);
+
+use Chart::Dygraphs qw(show_plot);
+use DateTime;
+
+my $start_date = DateTime->now(time_zone => 'UTC')->truncate(to => 'hour');
+my $time_series_data = [map {[$start_date->add(hours => 1)->clone(), rand($_)]} 1..1000];
+
+show_plot($time_series_data);
+```
 
 # DESCRIPTION
 
 Generate html/javascript charts from perl data using javascript library Dygraphs. The result
 is html that you could see in your favourite browser.
+
+Example screenshot of plot generated with examples/time\_series.pl:
+
+![Random time series plotted with Dygraphs](https://raw.githubusercontent.com/pablrod/p5-Chart-Dygraphs/master/examples/time_series.png)
 
 The interface is "sub" oriented, but the API is subject to changes.
 

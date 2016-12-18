@@ -2,7 +2,11 @@
 
 Chart::Dygraphs - Generate html/javascript charts from perl data using javascript library Dygraphs
 
-# SYNOPSYS
+# VERSION
+
+version 0.006
+
+# SYNOPSIS
 
 ```perl
 use Chart::Dygraphs qw(show_plot);
@@ -28,7 +32,7 @@ Example screenshot of plot generated with examples/time\_series.pl:
 
 ![Random time series plotted with Dygraphs](https://raw.githubusercontent.com/pablrod/p5-Chart-Dygraphs/master/examples/time_series.png)
 
-The interface is "sub" oriented, but the API is subject to changes.
+The API is subject to changes.
 
 # FUNCTIONS
 
@@ -113,3 +117,14 @@ AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES . THE IMP
               CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
             EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE
               .
+
+# AUTHOR
+
+Pablo Rodríguez González <pablo.rodriguez.gonzalez@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Pablo Rodríguez González.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

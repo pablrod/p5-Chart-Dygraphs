@@ -15,13 +15,11 @@ use Ref::Util;
 
 # VERSION
 
+# ABSTRACT: Generate html/javascript charts from perl data using javascript library Dygraphs
+
 =encoding utf-8
 
-=head1 NAME
-
-Chart::Dygraphs - Generate html/javascript charts from perl data using javascript library Dygraphs
-
-=head1 SYNOPSYS
+=head1 SYNOPSIS
 
 # EXAMPLE: examples/basic.pl
 
@@ -48,7 +46,9 @@ Example screenshot of plot generated with examples/time_series.pl:
 
 =end markdown
 
-The interface is "sub" oriented, but the API is subject to changes.
+The API is subject to changes.
+
+=cut
 
 =head1 FUNCTIONS
 
@@ -97,14 +97,14 @@ sub render_full_html {
     my %params = validate( @_,
                            {  data    => { type => SCALAR | ARRAYREF },
                               options => { type => HASHREF, default => { showRangeSelector => 1 } },
-                              render_html_options => {
-                                    type     => HASHREF,
-                                    optional => 1,
-                                    default => {}
+                              render_html_options => { type     => HASHREF,
+                                                       optional => 1,
+                                                       default  => {}
                               }
                            }
     );
-	return _render_html_wrap(_render_cell(_process_data_and_options(@params{qw(data options)}), $params{'render_html_options'}, ''));
+    return _render_html_wrap(
+           _render_cell( _process_data_and_options( @params{qw(data options)} ), $params{'render_html_options'}, '' ) );
 }
 
 sub _transform_data {
@@ -156,10 +156,10 @@ TEMPLATE
     if ( !defined $template_variables->{'dygraphs_javascript_object_name'} ) {
         $template_variables->{'dygraphs_javascript_object_name'} = 'g' . $id;
     }
-	if ( !defined $template_variables->{'dygraphs_div_inline_style'} ) {
+    if ( !defined $template_variables->{'dygraphs_div_inline_style'} ) {
         $template_variables->{'dygraphs_div_inline_style'} = 'width: 100%';
-	}
-	my $renderer = Text::Template->new(TYPE => 'STRING', SOURCE => $template );	
+    }
+    my $renderer = Text::Template->new( TYPE => 'STRING', SOURCE => $template );
     return $renderer->fill_in( HASH => $template_variables );
 }
 
@@ -199,10 +199,22 @@ sub show_plot {
     my $rendered_cells = "";
     my $numeric_id     = 0;
     for my $data (@data_to_plot) {
-        $rendered_cells .= _render_cell( _process_data_and_options( $data, { showRangeSelector => 1 } ),
-                                         { dygraphs_div_id => 'graphdiv' . $numeric_id, dygraphs_javascript_object_name => 'g' . $numeric_id },
-                                         'chart_' . $numeric_id++
-        );
+        if ( ref $data eq 'Chart::Dygraphs::Plot' ) {
+            $rendered_cells .= _render_cell( _process_data_and_options( $data->data, $data->options ),
+                                             {  dygraphs_div_id                 => 'graphdiv' . $numeric_id,
+                                                dygraphs_javascript_object_name => 'g' . $numeric_id
+                                             },
+                                             'chart_' . $numeric_id++
+            );
+
+        } else {
+            $rendered_cells .= _render_cell( _process_data_and_options( $data, { showRangeSelector => 1 } ),
+                                             {  dygraphs_div_id                 => 'graphdiv' . $numeric_id,
+                                                dygraphs_javascript_object_name => 'g' . $numeric_id
+                                             },
+                                             'chart_' . $numeric_id++
+            );
+        }
     }
     my $plots = _render_html_wrap($rendered_cells);
     HTML::Show::show($plots);

@@ -4,7 +4,7 @@ Chart::Dygraphs - Generate html/javascript charts from perl data using javascrip
 
 # VERSION
 
-version 0.006
+version 0.007
 
 # SYNOPSIS
 

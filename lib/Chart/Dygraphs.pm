@@ -95,7 +95,7 @@ Supported options:
 
 sub render_full_html {
     my %params = validate( @_,
-                           {  data    => { type => SCALAR | ARRAYREF },
+                           {  data    => { type => SCALAR | ARRAYREF | OBJECT},
                               options => { type => HASHREF, default => { showRangeSelector => 1 } },
                               render_html_options => { type     => HASHREF,
                                                        optional => 1,
@@ -126,6 +126,18 @@ sub _process_data_and_options {
     my $data           = shift();
     my $options        = shift();
     my $json_formatter = JSON->new->utf8;
+    local *PDL::TO_JSON = sub { $_[0]->unpdl };
+    if ( Ref::Util::is_blessed_ref($data) ) {
+        my $adapter_name = 'Chart::Dygraphs::Adapter::' . ref $data;
+        eval {
+            load $adapter_name;
+            my $adapter = $adapter_name->new( data => $data );
+            $data = $adapter->series();
+        };
+        if ($@) {
+            warn 'Cannot load adapter: ' . $adapter_name . '. ' . $@;
+        }
+    }
     return join( ',', _transform_data($data), $json_formatter->encode($options) );
 }
 

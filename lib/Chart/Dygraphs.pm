@@ -179,8 +179,9 @@ sub _render_html_wrap {
     my $body = shift();
 
     my $html_begin = <<'BEGIN_HTML';
-<html>
+<!DOCTYPE html>
 <head>
+<meta charset="utf-8" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/dygraph/1.1.1/dygraph-combined.js"></script>
 </head>
 <body>
